@@ -1,0 +1,62 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100 # Hz
+    use_sim_time: true
+
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+arm_controller:
+  ros__parameters:
+    use_sim_time: true
+    joints:
+      - panda_joint1
+      - panda_joint2
+      - panda_joint3
+      - panda_joint4
+      - panda_joint5
+      - panda_joint6
+      - panda_joint7
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+
+    open_loop_control: true
+    allow_integration_in_goal_trajectories: true
+
+gripper_controller:
+  ros__parameters:
+    use_sim_time: true
+    joints:
+      - panda_finger_joint1
+      - panda_finger_joint2
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+
+    open_loop_control: true
+    allow_integration_in_goal_trajectories: true
+
+    # Goal tolerances: without these, the controller requires the fingers to
+    # reach EXACTLY the commanded position (e.g. 0.0 for "closed"). If an
+    # object is physically between the fingers, they can never reach 0.0
+    # exactly, so the trajectory would be considered "not achieved" even
+    # though the fingers are correctly gripping the object. A 5mm tolerance
+    # lets the goal be considered reached once the fingers are blocked by
+    # something, rather than fighting past it or reporting failure.
+    constraints:
+      goal_time: 2.0
+      panda_finger_joint1:
+        goal: 0.005
+      panda_finger_joint2:
+        goal: 0.005
